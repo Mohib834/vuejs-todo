@@ -7,7 +7,13 @@
         :class="{'crossed': todo.done}"
       >{{todo.todoText}}</p>
       <v-spacer />
-      <v-icon @click="deleteTodo(todoIdx)" color="#CA0B00" v-ripple style="cursor:pointer">mdi-close</v-icon>
+      <v-icon
+        v-if="!completedTodos"
+        @click="deleteTodo(todoIdx)"
+        color="#CA0B00"
+        v-ripple
+        style="cursor:pointer"
+      >mdi-close</v-icon>
     </v-flex>
     <v-divider />
   </div>
@@ -23,6 +29,9 @@ export default {
     todoIdx: {
       type: Number,
       required: true
+    },
+    completedTodos: {
+      type: Boolean
     }
   },
   methods: {

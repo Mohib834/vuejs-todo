@@ -44,6 +44,7 @@
           :todoIdx="i"
           @deletedTodo="handleDeletedTodo"
           @completedTodo="handleCompletedTodo"
+          :completedTodos="true"
         />
       </div>
       <v-alert
@@ -98,12 +99,11 @@ export default {
       this.leftTodos++;
     },
     handleDeletedTodo(todoIdx) {
-      this.todos = this.todos.filter(todo => todo !== this.todos[todoIdx]);
-      this.completedTodos.splice(todoIdx, 1);
-
       if (!this.todos[todoIdx].done) {
         this.leftTodos--;
       }
+      this.todos = this.todos.filter(todo => todo !== this.todos[todoIdx]);
+      this.completedTodos.splice(todoIdx, 1);
     },
     handleCompletedTodo(todoIdx) {
       const selectedTodo = this.todos[todoIdx];
