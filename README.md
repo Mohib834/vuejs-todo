@@ -1,5 +1,7 @@
 # vue-todo-app
 
+![Thumbnail](thumbnail.png)
+
 ## Project setup
 ```
 npm install
