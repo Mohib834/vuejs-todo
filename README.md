@@ -1,4 +1,4 @@
-# vue-todo-app
+# Vue Todo App
 
 ![Thumbnail](thumbnail.png)
 
