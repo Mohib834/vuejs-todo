@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "core-js": "^3.4.3",
+    "gsap": "^3.0.1",
     "node-sass": "^4.13.0",
     "vue": "^2.6.10",
-    "vuetify": "^2.1.0"
+    "vuetify": "^2.1.0",
+    "vuex": "^3.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",

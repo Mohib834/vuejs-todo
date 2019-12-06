@@ -2,49 +2,25 @@
   <div style="width:100%">
     <v-divider />
     <v-flex class="footer-content mt-4 d-flex justify-space-between">
-      <span>{{ leftTodos }} Items left</span>
+      <span>{{leftTodos}} Items left</span>
       <a
         href
-        @click.prevent="clearCompleted"
-        :class="{'cleared': isCompletedTodoListEmpty}"
+        @click.prevent="clearCompletedTodo"
+        :class="{'cleared': isCompletedTodosEmpty}"
       >Clear completed</a>
     </v-flex>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
+
 export default {
-  props: {
-    completedTodos: {
-      type: Array,
-      required: true
-    },
-    todos: {
-      type: Array,
-      required: true
-    },
-    leftTodos: {
-      type: Number,
-      required: true
-    }
-  },
-  data() {
-    return {
-      isCompletedTodoListEmpty: true
-    };
-  },
-  watch: {
-    completedTodos(todosData) {
-      todosData.length > 0
-        ? (this.isCompletedTodoListEmpty = false)
-        : (this.isCompletedTodoListEmpty = true);
-    }
+  computed: {
+    ...mapGetters(["isCompletedTodosEmpty", "leftTodos"])
   },
   methods: {
-    clearCompleted() {
-      this.isCompletedTodoListEmpty = true;
-      this.$emit("clearedCompletedTodos");
-    }
+    ...mapMutations(["clearCompletedTodo"])
   }
 };
 </script>

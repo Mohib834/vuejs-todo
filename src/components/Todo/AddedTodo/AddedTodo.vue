@@ -1,15 +1,21 @@
 <template>
-  <div class="mb-2">
+  <div class="mb-2" ref="todo">
     <v-flex class="d-flex align-center" style="height:40px">
-      <v-checkbox v-model="todo.done" @change="onChangeHandler(todoIdx)" dense class="mb-n1"></v-checkbox>
+      <v-checkbox
+        v-model="completedTodos"
+        :value="todo"
+        dense
+        class="mb-n1"
+        @change="checkLeftTodos({todoIdx})"
+      ></v-checkbox>
       <p
         class="todo-text mb-0 ml-1 subtitle-1 font-weight-medium"
         :class="{'crossed': todo.done}"
       >{{todo.todoText}}</p>
       <v-spacer />
       <v-icon
-        v-if="!completedTodos"
-        @click="deleteTodo(todoIdx)"
+        v-if="!completedTodosContainer"
+        @click="deleteTodo({todoIdx})"
         color="#CA0B00"
         v-ripple
         style="cursor:pointer"
@@ -20,6 +26,9 @@
 </template>
 
 <script>
+import { TimelineMax, Power3 } from "gsap";
+import { mapActions } from "vuex";
+
 export default {
   props: {
     todo: {
@@ -30,17 +39,31 @@ export default {
       type: Number,
       required: true
     },
-    completedTodos: {
+    completedTodosContainer: {
       type: Boolean
     }
   },
-  methods: {
-    deleteTodo(idx) {
-      this.$emit("deletedTodo", idx);
-    },
-    onChangeHandler(idx) {
-      this.$emit("completedTodo", idx);
+  computed: {
+    completedTodos: {
+      get() {
+        return this.$store.state.completedTodos;
+      },
+      set(value) {
+        this.$store.state.completedTodos = value;
+      }
     }
+  },
+  methods: {
+    ...mapActions(["deleteTodo", "completeTodo", "checkLeftTodos"])
+  },
+  mounted() {
+    const tl = new TimelineMax();
+
+    tl.from(this.$refs.todo, 0.5, {
+      y: "-10px",
+      opacity: 0,
+      ease: Power3.easeOut
+    });
   }
 };
 </script>

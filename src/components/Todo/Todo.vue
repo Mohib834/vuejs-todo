@@ -8,11 +8,11 @@
       </v-tabs>
     </v-card-title>
     <v-card-text>
-      <v-form @submit.prevent="submitTodo">
+      <v-form @submit.prevent="addTodo">
         <v-flex class="d-flex align-center">
           <v-text-field label="What needs to be done?" v-model="todoText"></v-text-field>
           <v-btn
-            @click.prevent="submitTodo"
+            @click.prevent="addTodo"
             class="mr-n3 ml-2 mt-n2"
             elevation="3"
             color="primary"
@@ -26,25 +26,16 @@
       </v-form>
     </v-card-text>
     <v-card-text>
-      <div v-if="category === 0">
-        <AddedTodo
-          v-for="(todo, i) in todos"
-          :key="i"
-          :todo="todo"
-          :todoIdx="i"
-          @deletedTodo="handleDeletedTodo"
-          @completedTodo="handleCompletedTodo"
-        />
+      <div v-show="category === 0">
+        <AddedTodo v-for="(todo, i) in todos" :key="i" :todo="todo" :todoIdx="i" />
       </div>
-      <div v-else>
+      <div v-show="category === 1">
         <AddedTodo
           v-for="(todo, i) in completedTodos"
           :key="i"
           :todo="todo"
           :todoIdx="i"
-          @deletedTodo="handleDeletedTodo"
-          @completedTodo="handleCompletedTodo"
-          :completedTodos="true"
+          :completedTodosContainer="true"
         />
       </div>
       <v-alert
@@ -64,12 +55,7 @@
       </v-alert>
     </v-card-text>
     <v-card-actions class="mt-auto">
-      <TodoFooter
-        :completedTodos="completedTodos"
-        :todos="todos"
-        :leftTodos="leftTodos"
-        @clearedCompletedTodos="handleClearedCompletedTodos"
-      />
+      <TodoFooter />
     </v-card-actions>
   </v-card>
 </template>
@@ -77,6 +63,7 @@
 <script>
 import AddedTodo from "./AddedTodo/AddedTodo.vue";
 import TodoFooter from "./TodoFooter/TodoFooter.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   components: {
@@ -85,46 +72,37 @@ export default {
   },
   data() {
     return {
-      todoText: "",
-      todos: [],
-      completedTodos: [],
-      leftTodos: 0,
-      category: 0
+      leftTodos: 0
     };
   },
+  computed: {
+    todoText: {
+      get() {
+        return this.$store.state.todoText;
+      },
+      set(value) {
+        this.$store.state.todoText = value;
+      }
+    },
+    category: {
+      get() {
+        return this.$store.state.category;
+      },
+      set(value) {
+        this.$store.dispatch("updateCategory", value);
+      }
+    },
+    ...mapGetters(["todos", "completedTodos", "isCompletedTodosEmpty"])
+  },
   methods: {
-    submitTodo() {
-      this.todos.push({ todoText: this.todoText, done: false });
-      this.todoText = "";
-      this.leftTodos++;
-    },
-    handleDeletedTodo(todoIdx) {
-      if (!this.todos[todoIdx].done) {
-        this.leftTodos--;
-      }
-      this.todos = this.todos.filter(todo => todo !== this.todos[todoIdx]);
-      this.completedTodos.splice(todoIdx, 1);
-    },
-    handleCompletedTodo(todoIdx) {
-      const selectedTodo = this.todos[todoIdx];
-      if (selectedTodo.done) {
-        this.completedTodos.push(selectedTodo);
-        this.leftTodos--;
+    ...mapActions(["addTodo", "changeIsCompletedTodosEmpty", ])
+  },
+  watch: {
+    completedTodos(value) {
+      if (value.length > 0) {
+        this.changeIsCompletedTodosEmpty(false);
       } else {
-        if (this.completedTodos.includes(selectedTodo)) {
-          this.completedTodos.splice(todoIdx, 1);
-        }
-        this.leftTodos++;
-      }
-    },
-    handleClearedCompletedTodos() {
-      for (let completedTodo of this.completedTodos) {
-        if (this.todos.includes(completedTodo)) {
-          this.todos = this.todos.filter(todo => completedTodo !== todo);
-          this.completedTodos = this.todos.filter(
-            todo => completedTodo !== todo
-          );
-        }
+        this.changeIsCompletedTodosEmpty(true);
       }
     }
   }
