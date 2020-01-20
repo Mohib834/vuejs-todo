@@ -5,24 +5,28 @@
       <span>{{leftTodos}} Items left</span>
       <a
         href
-        @click.prevent="clearCompletedTodo"
+        @click.prevent="clearCompletedTodos"
         :class="{'cleared': isCompletedTodosEmpty}"
       >Clear completed</a>
     </v-flex>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapMutations } from "vuex";
+<script lang="ts">
+import Vue from "vue";
+import { mapGetters } from "vuex";
+import store from "@/store/store";
 
-export default {
+export default Vue.extend({
   computed: {
     ...mapGetters(["isCompletedTodosEmpty", "leftTodos"])
   },
   methods: {
-    ...mapMutations(["clearCompletedTodo"])
+    clearCompletedTodos(): void {
+      store.dispatch.clearCompletedTodo();
+    }
   }
-};
+});
 </script>
 
 <style lang="scss">
