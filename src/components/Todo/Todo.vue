@@ -8,9 +8,9 @@
       </v-tabs>
     </v-card-title>
     <v-card-text>
-      <v-form @submit.prevent="addTodo">
+      <v-form @submit.prevent="addTodo" ref="form" lazy-validation>
         <v-flex class="d-flex align-center">
-          <v-text-field label="What needs to be done?" v-model="todoText"></v-text-field>
+          <v-text-field label="What needs to be done?" v-model="todoText" :rules="rules"></v-text-field>
           <v-btn
             @click.prevent="addTodo"
             class="mr-n3 ml-2 mt-n2"
@@ -60,51 +60,63 @@
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import AddedTodo from "./AddedTodo/AddedTodo.vue";
 import TodoFooter from "./TodoFooter/TodoFooter.vue";
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
+import store from "@/store/store";
 
-export default {
+interface data {
+  leftTodos: number;
+  todoText: string;
+  rules: Array<any>;
+}
+
+export default Vue.extend({
   components: {
     AddedTodo,
     TodoFooter
   },
-  data() {
+  data(): data {
     return {
-      leftTodos: 0
+      leftTodos: 0,
+      todoText: "",
+      rules: [(v: string) => v.length === 0 && "Field cannot be left empty!"]
     };
   },
   computed: {
-    todoText: {
-      get() {
-        return this.$store.state.todoText;
-      },
-      set(value) {
-        this.$store.state.todoText = value;
-      }
-    },
     category: {
-      get() {
-        return this.$store.state.category;
+      get(): number {
+        return store.getters.category;
       },
-      set(value) {
-        this.$store.dispatch("updateCategory", value);
+      set(v: number) {
+        store.dispatch.updateCategory(v);
       }
     },
     ...mapGetters(["todos", "completedTodos", "isCompletedTodosEmpty"])
   },
   methods: {
-    ...mapActions(["addTodo", "changeIsCompletedTodosEmpty", ])
+    addTodo(): void {
+      if (this.todoText.length == 0) {
+        //@ts-ignore
+        this.$refs.form.validate();
+      } else {
+        store.dispatch.addTodo(this.todoText);
+        //@ts-ignore
+        this.$refs.form.resetValidation();
+        this.todoText = "";
+      }
+    }
   },
   watch: {
-    completedTodos(value) {
+    completedTodos(value: any): void {
       if (value.length > 0) {
-        this.changeIsCompletedTodosEmpty(false);
+        store.dispatch.changeIsCompletedTodosEmpty(false);
       } else {
-        this.changeIsCompletedTodosEmpty(true);
+        store.dispatch.changeIsCompletedTodosEmpty(true);
       }
     }
   }
-};
+});
 </script>

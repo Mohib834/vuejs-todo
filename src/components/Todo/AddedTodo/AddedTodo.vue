@@ -25,11 +25,12 @@
   </div>
 </template>
 
-<script>
-import { TimelineMax, Power3 } from "gsap";
-import { mapActions } from "vuex";
+<script lang="ts">
+import Vue from "vue";
+import { gsap } from "gsap";
+import store from "@/store/store";
 
-export default {
+export default Vue.extend({
   props: {
     todo: {
       type: Object,
@@ -45,27 +46,31 @@ export default {
   },
   computed: {
     completedTodos: {
-      get() {
-        return this.$store.state.completedTodos;
+      get(): Array<{ todoText: string; done: true }> {
+        return store.getters.completedTodos;
       },
-      set(value) {
-        this.$store.state.completedTodos = value;
+      set(value: Array<{ todoText: string; done: true }>): void {
+        store.state.todoModule.completedTodos = value;
       }
     }
   },
   methods: {
-    ...mapActions(["deleteTodo", "completeTodo", "checkLeftTodos"])
+    deleteTodo(payload: { todoIdx: number }): void {
+      store.dispatch.deleteTodo(payload);
+    },
+    checkLeftTodos(payload: { todoIdx: number }): void {
+      store.dispatch.checkLeftTodos(payload);
+    }
   },
   mounted() {
-    const tl = new TimelineMax();
+    const tl = gsap.timeline();
 
     tl.from(this.$refs.todo, 0.5, {
       y: "-10px",
-      opacity: 0,
-      ease: Power3.easeOut
+      opacity: 0
     });
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

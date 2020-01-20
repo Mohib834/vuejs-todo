@@ -10,20 +10,18 @@
   </v-app>
 </template>
 
-<script>
-import Todo from "@/components/Todo/Todo.vue";
+<script lang="ts">
+import Vue from "vue";
+import Todo from "./components/Todo/Todo.vue";
 
-export default {
+export default Vue.extend({
   components: {
     Todo
   }
-};
+});
 </script>
 
 <style lang="scss">
-body {
-}
-
 #app {
   font-family: "Montserrat", sans-serif !important;
   height: 100vh;
